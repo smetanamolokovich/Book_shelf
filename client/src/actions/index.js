@@ -4,14 +4,14 @@ import axios from 'axios';
 // BOOK
 export function getBooks(limit = 10, start = 0, order = 'asc', list = null) {
     const request = axios.get(`/api/books?limit=${limit}&skip=${start}&order=${order}`)
-    .then(response => {
-        if(list) {
-            return [...list, ...response.data];
-        }
-        else {
-            return response.data;
-        }
-    });
+        .then(response => {
+            if (list) {
+                return [...list, ...response.data];
+            }
+            else {
+                return response.data;
+            }
+        });
 
     return {
         type: 'GET_BOOKS',
@@ -23,25 +23,25 @@ export function getBookWithReviewer(ownerId) {
     const request = axios.get(`/api/getBook?id=${ownerId}`);
 
     return (dispatch) => {
-        request.then(({data}) => {
+        request.then(({ data }) => {
             let book = data;
 
             axios.get(`/api/getReviewer?id=${book.ownerId}`)
-            .then(({data}) => {
+                .then(({ data }) => {
 
-                let response = {
-                    book,
-                    reviewer: data
-                }
-                console.log(response);
-                
-                dispatch({
-                    type: 'GET_BOOK_WITH_REVIEWER',
-                    payload: response
+                    let response = {
+                        book,
+                        reviewer: data
+                    }
+                    console.log(response);
+
+                    dispatch({
+                        type: 'GET_BOOK_WITH_REVIEWER',
+                        payload: response
+                    });
                 });
-            });
-            
-            
+
+
         });
     }
 }
@@ -58,7 +58,7 @@ export function clearBookWithReviewer() {
 
 export function getBook(id) {
     const request = axios.get(`/api/getBook?id=${id}`)
-                    .then(response => response.data);
+        .then(response => response.data);
 
     return {
         type: 'GET_BOOK',
@@ -67,7 +67,7 @@ export function getBook(id) {
 }
 export function updateBook(data) {
     const request = axios.post(`/api/book_update`, data)
-                    .then(response => response.data);
+        .then(response => response.data);
 
     return {
         type: 'UPDATE_BOOK',
@@ -76,7 +76,7 @@ export function updateBook(data) {
 }
 export function deletePost(id) {
     const request = axios.delete(`/api/delete_book?id=${id}`)
-                    .then(response => response.data);
+        .then(response => response.data);
 
     return {
         type: 'DELETE_BOOK',
@@ -99,9 +99,9 @@ export function clearBooks() {
 
 // USER
 
-export function loginUser({email, password}) {
-    const request = axios.post('/api/login', {email, password})
-    .then(response => response.data)
+export function loginUser({ email, password }) {
+    const request = axios.post('/api/login', { email, password })
+        .then(response => response.data)
 
     return {
         type: 'USER_LOGIN',
@@ -111,7 +111,7 @@ export function loginUser({email, password}) {
 
 export function auth() {
     const request = axios.get('/api/auth')
-                    .then(response => response.data);
+        .then(response => response.data);
 
     return {
         type: 'USER_AUTH',
@@ -121,7 +121,7 @@ export function auth() {
 
 export function addBook(book) {
     const request = axios.post('/api/book', book)
-                    .then(response => response.data);
+        .then(response => response.data);
 
     return {
         type: 'ADD_BOOK',
@@ -138,9 +138,36 @@ export function clearBook() {
 
 export function getUserPosts(userID) {
     const request = axios.get(`/api/user_posts?user=${userID}`)
-                    .then(response => response.data);
+        .then(response => response.data);
     return {
         type: 'GET_USER_POSTS',
         payload: request
+    }
+}
+
+export function getUsers() {
+    const request = axios.get('/api/users')
+        .then(response => response.data);
+    return {
+        type: 'GET_USERS',
+        payload: request
+    }
+}
+export function registerUser({ name, lastname, email, password }, userList) {
+    const request = axios.post('/api/register', { name, lastname, email, password });
+
+    return (dispatch) => {
+        request.then(({ data }) => {
+            let users = data.success ? [...userList, data.user] : userList;
+            let response = {
+                success: data.success,
+                users
+            }
+
+            dispatch({
+                type: 'REGISTER_USER',
+                payload: response
+            })
+        })
     }
 }
